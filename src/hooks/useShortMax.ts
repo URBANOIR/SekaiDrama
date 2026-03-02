@@ -56,23 +56,27 @@ interface ShortMaxDetailResponse {
   collectNum: number;
 }
 
-interface ShortMaxEpisodeResponse {
+interface ShortMaxEpisode {
+  episodeNumber: number;
+  id: number;
+  duration: number;
+  locked: boolean;
+  needDecrypt: boolean;
+  cover: string;
+  videoUrl: {
+    video_480?: string;
+    video_720?: string;
+    video_1080?: string;
+  };
+}
+
+interface ShortMaxAllEpisodesResponse {
   success: boolean;
   shortPlayId: number;
   shortPlayName: string;
   totalEpisodes: number;
-  episode: {
-    episodeNum: number;
-    id: number;
-    duration: number;
-    locked: boolean;
-    cover: string;
-    videoUrl: {
-      video_480?: string;
-      video_720?: string;
-      video_1080?: string;
-    };
-  };
+  count: number;
+  episodes: ShortMaxEpisode[];
 }
 
 export function useShortMaxRekomendasi() {
@@ -123,15 +127,15 @@ export function useShortMaxDetail(shortPlayId: string) {
   });
 }
 
-export function useShortMaxEpisode(shortPlayId: string, episodeNumber: number) {
-  return useQuery<ShortMaxEpisodeResponse>({
-    queryKey: ["shortmax", "episode", shortPlayId, episodeNumber],
-    queryFn: () => fetchJson<ShortMaxEpisodeResponse>(
-      `/api/shortmax/episode?shortPlayId=${shortPlayId}&episodeNumber=${episodeNumber}`
+export function useShortMaxAllEpisodes(shortPlayId: string) {
+  return useQuery<ShortMaxAllEpisodesResponse>({
+    queryKey: ["shortmax", "allepisodes", shortPlayId],
+    queryFn: () => fetchJson<ShortMaxAllEpisodesResponse>(
+      `/api/shortmax/episode?shortPlayId=${shortPlayId}`
     ),
-    enabled: !!shortPlayId && episodeNumber > 0,
+    enabled: !!shortPlayId,
     staleTime: 5 * 60 * 1000,
   });
 }
 
-export type { ShortMaxResponse, ShortMaxForYouResponse, ShortMaxSearchResponse, ShortMaxDetailResponse, ShortMaxEpisodeResponse };
+export type { ShortMaxResponse, ShortMaxForYouResponse, ShortMaxSearchResponse, ShortMaxDetailResponse, ShortMaxAllEpisodesResponse, ShortMaxEpisode };
